@@ -20,24 +20,9 @@ import (
 
 func createReportChannelMessage(ctx context.Context) (string, *slack.Channel, *models.Team, error) {
 	api, _ := contextutils.SlackApi(ctx)
-	config, _ := contextutils.Config(ctx)
 	db, _ := contextutils.Database(ctx)
 
-	var channel *slack.Channel
-
-	if channels, _, err := api.GetConversations(&slack.GetConversationsParameters{
-		ExcludeArchived: true,
-	}); err == nil {
-		for _, c := range channels {
-			if c.Name == config.Slack.ReportChannelName {
-				channel = &c
-				break
-			}
-		}
-	} else {
-		return "", nil, nil, err
-	}
-
+	channel := getReportChannel(ctx)
 	if channel == nil {
 		return "", nil, nil, common.ErrChannelNotFound.Error()
 	}

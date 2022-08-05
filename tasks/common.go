@@ -9,10 +9,68 @@ package tasks
 import (
 	"context"
 
+	"github.com/SomusHQ/tacostand/builders"
+	"github.com/SomusHQ/tacostand/common"
 	"github.com/SomusHQ/tacostand/contextutils"
 	"github.com/SomusHQ/tacostand/db/models"
 	"github.com/slack-go/slack"
 )
+
+func getReportChannel(ctx context.Context) *slack.Channel {
+	api, _ := contextutils.SlackApi(ctx)
+	config, _ := contextutils.Config(ctx)
+
+	var channel *slack.Channel
+
+	if channels, _, err := api.GetConversations(&slack.GetConversationsParameters{
+		ExcludeArchived: true,
+	}); err == nil {
+		for _, c := range channels {
+			if c.Name == config.Slack.ReportChannelName {
+				channel = &c
+				break
+			}
+		}
+	}
+
+	return channel
+}
+
+func wrapReport(ctx context.Context, user *slack.User, report *models.Report) error {
+	db, _ := contextutils.Database(ctx)
+	api, _ := contextutils.SlackApi(ctx)
+
+	var summary models.Summary
+	result := db.SummaryModel.Where("id = ?", report.SummaryID).Take(&summary)
+	if db.NoMatch(result) {
+		return common.ErrSummaryNotFound.Error()
+	}
+
+	var answers []*models.Answer
+	result = db.AnswerModel.Preload("Question").Where("report_id = ?", report.ID).Find(&answers)
+	if db.NoMatch(result) || len(answers) == 0 {
+		return common.ErrAnswersNotFound.Error()
+	}
+
+	channel := getReportChannel(ctx)
+
+	message := builders.StandupReportMessage(answers)
+
+	username := user.RealName
+	if len(username) == 0 {
+		username = user.Name
+	}
+
+	_, _, err := api.PostMessage(
+		channel.ID,
+		slack.MsgOptionText(message, false),
+		slack.MsgOptionTS(summary.ThreadID),
+		slack.MsgOptionUsername(username),
+		slack.MsgOptionIconURL(user.Profile.ImageOriginal),
+	)
+
+	return err
+}
 
 // AskQuestion will ask a single question from a member, and if the `answer`
 // argument is provided, it will also answer the last popped question. It will
@@ -52,7 +110,16 @@ func AskQuestion(ctx context.Context, member *models.Member, answer string) erro
 
 		inquirer.Destroy(member.ID)
 
-		return err
+		if err != nil {
+			return err
+		}
+
+		user, err := api.GetUserInfo(member.ID)
+		if err != nil {
+			return err
+		}
+
+		return wrapReport(ctx, user, &report)
 	}
 
 	_, _, err := api.PostMessage(member.ID, slack.MsgOptionText(question.Contents, false))

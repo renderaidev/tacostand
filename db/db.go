@@ -66,11 +66,12 @@ func New(config *config.Config, appLogger *logs.Logger) (*DB, error) {
 	}
 
 	appLogger.Success("Database connection established successfully.")
-	appLogger.Info("Running database migrations...")
 
-	migrations.Migrate(db)
-
-	appLogger.Success("Database migrations completed successfully.")
+	if !config.SkipMigrations {
+		appLogger.Info("Running database migrations...")
+		migrations.Migrate(db)
+		appLogger.Success("Database migrations completed successfully.")
+	}
 
 	return &DB{
 		DB: db,

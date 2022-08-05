@@ -58,12 +58,16 @@ func Init() (*Config, error) {
 	debugModeRaw := os.Getenv("DEBUG_MODE")
 	debugMode := debugModeRaw == "true"
 
+	skipMigrationsRaw := os.Getenv("SKIP_MIGRATIONS")
+	skipMigrations := skipMigrationsRaw == "true"
+
 	return &Config{
 		Slack: &SlackConfig{
 			AppToken:          slackAppToken,
 			BotToken:          slackBotToken,
 			ReportChannelName: slackReportChannelName,
 		},
+
 		Database: &DatabaseConfig{
 			Host:     databaseHost,
 			Port:     databasePort,
@@ -71,8 +75,11 @@ func Init() (*Config, error) {
 			Password: databasePassword,
 			Name:     databaseName,
 		},
+
 		CronExpression: cronExpression,
 		WrapUpTime:     uint32(wrapUpTime),
+
 		DebugMode:      debugMode,
+		SkipMigrations: skipMigrations,
 	}, nil
 }

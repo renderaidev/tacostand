@@ -62,6 +62,8 @@ const (
 	ErrChannelNotFound StandupSchedulerError = iota
 	ErrFailedToGetTeamInfo
 	ErrTeamNotRegistered
+	ErrSummaryNotFound
+	ErrAnswersNotFound
 )
 
 func (e StandupSchedulerError) Error() error {
@@ -72,6 +74,10 @@ func (e StandupSchedulerError) Error() error {
 		return fmt.Errorf("failed to get team info")
 	case ErrTeamNotRegistered:
 		return fmt.Errorf("team not registered")
+	case ErrSummaryNotFound:
+		return fmt.Errorf("tried sending standup report for a summary that doesn't exist")
+	case ErrAnswersNotFound:
+		return fmt.Errorf("the provided member does not have answers for this report")
 	default:
 		return fmt.Errorf("standup scheduler error")
 	}

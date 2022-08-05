@@ -34,5 +34,6 @@ type Config struct {
 	CronExpression string
 	WrapUpTime     uint32
 
-	DebugMode bool
+	DebugMode      bool
+	SkipMigrations bool
 }
