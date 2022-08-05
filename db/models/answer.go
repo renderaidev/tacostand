@@ -22,3 +22,11 @@ type Answer struct {
 
 	Contents string `json:"contents"`
 }
+
+func NewAnswer(question *Question, report *Report, contents string) *Answer {
+	return &Answer{
+		Question: question,
+		Report:   report,
+		Contents: contents,
+	}
+}

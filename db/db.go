@@ -84,6 +84,7 @@ func New(config *config.Config, appLogger *logs.Logger) (*DB, error) {
 	}, nil
 }
 
+// NoMatch is a helper method that check if a query returned no records.
 func (db *DB) NoMatch(tx *gorm.DB) bool {
 	return errors.Is(tx.Error, gorm.ErrRecordNotFound)
 }

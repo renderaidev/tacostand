@@ -29,3 +29,20 @@ type Summary struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+// NewSummary creates a new summary instance for a team. It also saves the ID
+// of the thread that was created for collecting the report summaries.
+func NewSummary(team *Team, threadID string) *Summary {
+	return &Summary{
+		Team:      team,
+		ThreadID:  threadID,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+}
+
+// NewReport adds a new report for a specific member to the current stand-up
+// summary.
+func (s *Summary) NewReport(member *Member) *Report {
+	return NewReport(s, member)
+}

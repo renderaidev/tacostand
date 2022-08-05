@@ -26,10 +26,13 @@ type DatabaseConfig struct {
 
 // Config wraps around the Slack and database configurations and contains
 // a cron expression for running the stand-up notifications periodically.
+// Additionally, it contains a WrapUpTime property, which represents how much
+// time do people have to finish their stand-up before everything is wrapped up.
 type Config struct {
 	Slack          *SlackConfig
 	Database       *DatabaseConfig
 	CronExpression string
+	WrapUpTime     uint32
 
 	DebugMode bool
 }

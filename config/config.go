@@ -40,6 +40,11 @@ func Init() (*Config, error) {
 		return nil, common.ErrInvalidCronExpression.Error()
 	}
 
+	wrapUpTime, err := strconv.Atoi(os.Getenv("WRAP_UP_TIME"))
+	if err != nil {
+		wrapUpTime = 30
+	}
+
 	databaseHost := os.Getenv("PGHOST")
 	databasePort, err := strconv.Atoi(os.Getenv("PGPORT"))
 	if err != nil {
@@ -67,6 +72,7 @@ func Init() (*Config, error) {
 			Name:     databaseName,
 		},
 		CronExpression: cronExpression,
+		WrapUpTime:     uint32(wrapUpTime),
 		DebugMode:      debugMode,
 	}, nil
 }

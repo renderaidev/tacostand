@@ -11,8 +11,8 @@ import (
 	"fmt"
 
 	"github.com/SomusHQ/tacostand/builders"
-	"github.com/SomusHQ/tacostand/commands"
 	"github.com/SomusHQ/tacostand/contextutils"
+	"github.com/SomusHQ/tacostand/handlers/commands"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/socketmode"
 )

@@ -53,3 +53,26 @@ func (e ParseError) Error() error {
 		return fmt.Errorf("parse error")
 	}
 }
+
+// StandupSchedulerError is an error that is raised when the standup scheduler
+// fails to perform its job.
+type StandupSchedulerError int
+
+const (
+	ErrChannelNotFound StandupSchedulerError = iota
+	ErrFailedToGetTeamInfo
+	ErrTeamNotRegistered
+)
+
+func (e StandupSchedulerError) Error() error {
+	switch e {
+	case ErrChannelNotFound:
+		return fmt.Errorf("standup report channel not found")
+	case ErrFailedToGetTeamInfo:
+		return fmt.Errorf("failed to get team info")
+	case ErrTeamNotRegistered:
+		return fmt.Errorf("team not registered")
+	default:
+		return fmt.Errorf("standup scheduler error")
+	}
+}

@@ -35,3 +35,8 @@ func (t *Team) NewQuestion(question string) *Question {
 func (t *Team) NewMember(userID string) *Member {
 	return NewMember(userID, t)
 }
+
+// NewSummary creates a new stand-up summary for a team.
+func (t *Team) NewSummary(threadID string) *Summary {
+	return NewSummary(t, threadID)
+}

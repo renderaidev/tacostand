@@ -27,6 +27,7 @@ func main() {
 	ctx = contextutils.WithSlackApi(ctx, client.SlackAPI)
 	ctx = contextutils.WithSlackSocketClient(ctx, client.SlackSocketClient)
 	ctx = contextutils.WithDatabase(ctx, client.Database)
+	ctx = contextutils.WithInquirer(ctx, client.Inquirer)
 
 	err = client.Run(ctx)
 

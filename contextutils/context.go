@@ -12,6 +12,7 @@ import (
 
 	"github.com/SomusHQ/tacostand/config"
 	"github.com/SomusHQ/tacostand/db"
+	"github.com/SomusHQ/tacostand/inquirer"
 	"github.com/SomusHQ/tacostand/logger"
 	"github.com/go-co-op/gocron"
 	"github.com/slack-go/slack"
@@ -33,6 +34,7 @@ var (
 	ctxSlackSocketClient = &contextKey{"slackSocketClient"}
 	ctxScheduler         = &contextKey{"scheduler"}
 	ctxDatabase          = &contextKey{"database"}
+	ctxInquirer          = &contextKey{"inquirer"}
 )
 
 // WithConfig returns a Go context with a configuration object.
@@ -123,4 +125,19 @@ func Database(ctx context.Context) (*db.DB, error) {
 	}
 
 	return db, nil
+}
+
+// WithInquirer returns a Go context with an inquirer instance.
+func WithInquirer(ctx context.Context, inquirer *inquirer.Inquirer) context.Context {
+	return context.WithValue(ctx, ctxInquirer, inquirer)
+}
+
+// Inquirer attempts to extract the inquirer instance from a Go context.
+func Inquirer(ctx context.Context) (*inquirer.Inquirer, error) {
+	inquirer, ok := ctx.Value(ctxInquirer).(*inquirer.Inquirer)
+	if !ok {
+		return nil, fmt.Errorf("missing context: %s", ctxInquirer)
+	}
+
+	return inquirer, nil
 }

@@ -23,6 +23,7 @@ var EVENT_HANDLERS = map[socketmode.EventType]EventHandler{
 	socketmode.EventTypeConnected:       handlers.Connected,
 	socketmode.EventTypeConnectionError: handlers.ConnectionError,
 	socketmode.EventTypeSlashCommand:    handlers.SlashCommand,
+	socketmode.EventTypeEventsAPI:       handlers.EventsAPIEvent,
 }
 
 // HandleEvents is called in the goroutine channel that receives socket events.

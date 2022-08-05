@@ -14,6 +14,7 @@ import (
 
 	"github.com/SomusHQ/tacostand/config"
 	"github.com/SomusHQ/tacostand/db"
+	"github.com/SomusHQ/tacostand/inquirer"
 	"github.com/SomusHQ/tacostand/logger"
 	"github.com/SomusHQ/tacostand/tasks"
 	"github.com/go-co-op/gocron"
@@ -29,6 +30,7 @@ type Client struct {
 	SlackSocketClient *socketmode.Client
 	Scheduler         *gocron.Scheduler
 	Database          *db.DB
+	Inquirer          *inquirer.Inquirer
 }
 
 // NewClient creates a new application client and instantiates all the required
@@ -70,6 +72,7 @@ func NewClient() (*Client, error) {
 	}
 
 	client.Database = database
+	client.Inquirer = inquirer.NewInquirer()
 
 	return client, nil
 }
