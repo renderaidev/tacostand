@@ -61,14 +61,14 @@ func promptMembers(ctx context.Context, summary *models.Summary, team *models.Te
 	inquirer, _ := contextutils.Inquirer(ctx)
 
 	var members []models.Member
-	db.MemberModel.Where("team_id = ?", team.ID).Find(&members)
+	db.Where("team_id = ?", team.ID).Find(&members)
 
 	if len(members) == 0 {
 		return nil
 	}
 
 	var questions []*models.Question
-	db.QuestionModel.Where("team_id = ?", team.ID).Find(&questions)
+	db.Where("team_id = ?", team.ID).Find(&questions)
 
 	for _, member := range members {
 		_, _, err := api.PostMessage(member.ID, slack.MsgOptionText("Hey! It's time to complete the daily standup 🎉", false))

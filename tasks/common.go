@@ -41,13 +41,13 @@ func wrapReport(ctx context.Context, user *slack.User, report *models.Report) er
 	api, _ := contextutils.SlackApi(ctx)
 
 	var summary models.Summary
-	result := db.SummaryModel.Where("id = ?", report.SummaryID).Take(&summary)
+	result := db.Where("id = ?", report.SummaryID).Take(&summary)
 	if db.NoMatch(result) {
 		return common.ErrSummaryNotFound.Error()
 	}
 
 	var answers []*models.Answer
-	result = db.AnswerModel.Preload("Question").Where("report_id = ?", report.ID).Find(&answers)
+	result = db.Preload("Question").Where("report_id = ?", report.ID).Find(&answers)
 	if db.NoMatch(result) || len(answers) == 0 {
 		return common.ErrAnswersNotFound.Error()
 	}

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/SomusHQ/tacostand/common"
 	"github.com/slack-go/slack"
 )
 
@@ -36,8 +37,8 @@ func BuildWrapUpBlock(reportID uint64) []slack.Block {
 	)
 
 	buttonblock := slack.NewActionBlock(
-		"add_answers_block",
-		slack.NewButtonBlockElement("add_answers", id, slack.NewTextBlockObject(slack.PlainTextType, "Add answers", false, false)),
+		string(common.ADD_ANSWERS_BLOCK_ID),
+		slack.NewButtonBlockElement(string(common.ADD_ANSWERS_BUTTON_ID), id, slack.NewTextBlockObject(slack.PlainTextType, "Add answers", false, false)),
 	)
 
 	blocks = append(blocks, textblock, buttonblock)

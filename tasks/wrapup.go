@@ -16,7 +16,10 @@ import (
 	"github.com/slack-go/slack"
 )
 
-func informUserAboutWrapUp(ctx context.Context, memberID string, reportID uint64) {
+// InformUserAboutWrapUp will send a message to the user telling them that they
+// have ran out of time to submit their answers. It will also create a button
+// which will allow them to add their answers again.
+func InformUserAboutWrapUp(ctx context.Context, memberID string, reportID uint64) {
 	api, _ := contextutils.SlackApi(ctx)
 	logger, _ := contextutils.Logger(ctx)
 
@@ -34,6 +37,7 @@ func HandleWrapUp(ctx context.Context) func() {
 	logger, _ := contextutils.Logger(ctx)
 	api, _ := contextutils.SlackApi(ctx)
 	db, _ := contextutils.Database(ctx)
+	inquirer, _ := contextutils.Inquirer(ctx)
 
 	return func() {
 		logger.Info("Received request to wrap up standup reports.")
@@ -55,15 +59,19 @@ func HandleWrapUp(ctx context.Context) func() {
 		db.Where("team_id = ?", teaminfo.ID).Find(&questions)
 
 		var reports []models.Report
-		db.ReportModel.Preload("Answers").Where("summary_id = ? AND ongoing = ?", summary.ID, true).Find(&reports)
+		db.Preload("Answers").Where("summary_id = ? AND ongoing = ?", summary.ID, true).Find(&reports)
 
 		for _, report := range reports {
 			report.Ongoing = false
 			db.Save(&report)
 
+			if inquirer.Exists(report.MemberID) {
+				inquirer.Destroy(report.MemberID)
+			}
+
 			if len(report.Answers) != len(questions) {
 				logger.Info(fmt.Sprintf("Report %d has %d/%d answers. Informing user...", report.ID, len(report.Answers), len(questions)))
-				informUserAboutWrapUp(ctx, report.MemberID, report.ID)
+				InformUserAboutWrapUp(ctx, report.MemberID, report.ID)
 			}
 		}
 
